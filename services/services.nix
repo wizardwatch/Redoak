@@ -1,42 +1,30 @@
 { config, pkgs, lib, trunk, home-manager, self, inputs, ... }:
 {
+  imports = [
+    #./matrix.nix
+  ];
+
   services = {
-    pipewire = {
-      wireplumber.enable = true;
-      enable = true;
-      alsa.enable = true;
-      pulse.enable = true;
-      jack.enable = false;
-    };
     openssh = {
       enable = true;
       settings.PasswordAuthentication = false;
-    };
-    printing = {
+    };/*
+    nextcloud = {
       enable = true;
-      drivers = with pkgs; [
-        gutenprint
-        brlaser
-      ];
-    };
-    flatpak.enable = true;
+      hostName = "nextcloud.localhost";
+      home = "/network/nextcloud";
+      config = {
+        adminpassFile = "/etc/nextcloud_pass_file";
+        extraTrustedDomains = ["192.168.1.214"];
+      };
+    };*/
     gnome.gnome-keyring.enable = true;
     fstrim.enable = true;
   };
-
-  systemd = {
-    user.services.polkit-gnome-authentication-agent-1 = {
-      description = "polkit-gnome-authentication-agent-1";
-      wants = [ "graphical-session.target" ];
-      wantedBy = [ "graphical-session.target" ];
-      after = [ "graphical-session.target" ];
-      serviceConfig = {
-        Type = "simple";
-        ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
-        Restart = "on-failure";
-        RestartSec = 1;
-        TimeoutStopSec = 10;
-      };
-    };
+  services.zerotierone = {
+    enable = true;
+    joinNetworks = [
+      "3efa5cb78a1171d9"
+    ];
   };
 }

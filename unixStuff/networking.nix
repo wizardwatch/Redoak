@@ -1,30 +1,77 @@
 { config, pkgs, lib, trunk, home-manager, self, inputs, ... }:
 {
-  environment.systemPackages = with pkgs; [
-    networkmanagerapplet
-  ];
-  networking = {
-    hostName = "willow";
-    firewall = {
-      allowedTCPPorts = [ 27036 27037 49737 6969];
-      allowedUDPPorts = [ 27031 27036 6969 122];
+  
+  boot.kernelModules = ["macvtap"];
+    networking.macvlans.lan = {
+      interface = "eno1np0";
+
+      mode = "bridge";
     };
-    # Used previously, likely useful in the future
+  networking = {
+    hostName = "redoak";
+    networkmanager.enable = false;
+    # Disable global dhcp as this by default uses networkmanager.
+    # Normally you can override this with useNetworkd, but
+    # https://nixos.wiki/wiki/Systemd-networkd recomends against
+    # setting useNetworkd to true if the network is configured within
+    # systemd.network, which it is here. 
+    useDHCP = false;
+    firewall = {
+      allowedTCPPorts = [ 27036 27037 80 443 22];
+      allowedUDPPorts = [ 27031 27036 67 ];
+    };
+  };
+  systemd.network = {
+    enable = true;
+    ###
+    ### Connection to LAN
+    ###
+    networks."30-eno1np1" = {
+      matchConfig.Name = "eno1np1";
+      networkConfig = {
+        DHCP = "ipv4";
+        DNS = [ "192.168.1.146" "1.1.1.1" ];
+      };
+      linkConfig.RequiredForOnline = "routable";
+    };
+    ###
+    ### Container Networking
+    ###
     /*
-    interfaces.enp6s0.ipv4.addresses = [{
-      address = "192.168.1.169";
-      prefixLength = 24;
-    }];
-    nat = {
-      enable = true;
-      internalInterfaces = ["ve-*"];
-      externalInterface = "enp6s0";
+    networks = {
+      "20-eno1np0" = {
+        matchConfig.Name = "eno1np0";
+      };
+      
+      "10-br0" = {
+        matchConfig.Name = "br0";
+        networkConfig = {
+          DHCPServer = true;
+          IPv6SendRA = true;
+        };
+        addresses = [ {
+          addressConfig.Address = "10.0.0.1/24";
+        } {
+          addressConfig.Address = "fd12:3456:789a::1/64";
+        } ];
+        ipv6Prefixes = [ {
+          ipv6PrefixConfig.Prefix = "fd12:3456:789a::/64";
+        } ];
+      };
+      "11-lan" = {
+        matchConfig.Name = ["vm-*"];
+        networkConfig = {
+          Bridge = "br0";
+        };
+      };
+    };
+    netdevs = {
+     "10-br0" = {
+        netdevConfig = {
+          Name = "br0";
+          Kind = "bridge";
+        };
+      };
     };*/
-    nameservers = [ "192.168.0.1" ];
-    networkmanager.enable = true;
-    extraHosts = ''
-      10.129.229.198 board.htb crm.board.htb test.board.htb
-      10.129.222.148 boardlight.htb
-    '';
   };
 }
