@@ -4,20 +4,14 @@ let
   minPort = 49000;
   maxPort = 50000;
   baseURL = "matrix.genchumen.com";
+in
+let
+    range = [ {
+        from = minPort;
+        to = maxPort;
+    } ];
 in {
-
-  systemd.network.enable = true;
-  systemd.network.networks."20-lan" = {
-    matchConfig.Type = "ether";
-    networkConfig = {
-      Address = ["192.168.1.20/24" "2001:db8::b/64"];
-      Gateway = "192.168.1.1";
-      DNS = ["192.168.1.1"];
-      IPv6AcceptRA = true;
-      DHCP = "no";
-    };
-  };
-  # enable coturn
+ # enable coturn
   services.coturn = rec {
     enable = true;
     no-cli = true;
@@ -60,18 +54,10 @@ in {
   };
   # open the firewall
   networking.firewall = {
-    interfaces.enp2s0 =
-    let range = [ {
-        from = minPort;
-        to = maxPort;
-    } ];
-    in
-    {
-      allowedUDPPortRanges = range;
-      allowedUDPPorts = [ 3478 5349 ];
-      allowedTCPPortRanges = [ ];
-      allowedTCPPorts = [ 3478 5349 ];
-    };
+    allowedUDPPortRanges = range;
+    allowedUDPPorts = [ 3478 5349 ];
+    allowedTCPPortRanges = [ ];
+    allowedTCPPorts = [ 3478 5349 ];    
   };
   /*
   # get a certificate
@@ -80,15 +66,7 @@ in {
     postRun = "systemctl restart coturn.service";
     group = "turnserver";
   };*/
-  services.conduwuit = {
-    enable = true;
-    settings = {
-      global = {
-        server_name = baseURL;
-      };    
-    };
-  };
-  /*# configure synapse to point users to coturn
+ /*# configure synapse to point users to coturn
   services.matrix-synapse.settings = with config.services.coturn; {
     turn_uris = ["turn:${realm}:3478?transport=udp" "turn:${realm}:3478?transport=tcp"];
     turn_shared_secret = static-auth-secret;

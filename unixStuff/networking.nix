@@ -10,6 +10,10 @@
   networking = {
     hostName = "redoak";
     networkmanager.enable = false;
+
+    # disable ipv6 because it is COOKED
+    enableIPv6 = false;
+
     # Disable global dhcp as this by default uses networkmanager.
     # Normally you can override this with useNetworkd, but
     # https://nixos.wiki/wiki/Systemd-networkd recomends against
@@ -30,48 +34,29 @@
       matchConfig.Name = "eno1np1";
       networkConfig = {
         DHCP = "ipv4";
-        DNS = [ "192.168.1.146" "1.1.1.1" ];
+        DNS = [ "1.1.1.1" ];
       };
       linkConfig.RequiredForOnline = "routable";
     };
     ###
     ### Container Networking
     ###
-    /*
-    networks = {
-      "20-eno1np0" = {
-        matchConfig.Name = "eno1np0";
-      };
-      
-      "10-br0" = {
-        matchConfig.Name = "br0";
-        networkConfig = {
-          DHCPServer = true;
-          IPv6SendRA = true;
-        };
-        addresses = [ {
-          addressConfig.Address = "10.0.0.1/24";
-        } {
-          addressConfig.Address = "fd12:3456:789a::1/64";
-        } ];
-        ipv6Prefixes = [ {
-          ipv6PrefixConfig.Prefix = "fd12:3456:789a::/64";
-        } ];
-      };
-      "11-lan" = {
-        matchConfig.Name = ["vm-*"];
-        networkConfig = {
-          Bridge = "br0";
-        };
+
+  };
+  ###
+  ### ACME
+  ###
+  /*security.acme = {
+    acceptTerms = true;
+    defaults.email = "wyatt.osterling@hotmail.com";
+    certs."genchumeni.com" = {
+      dnsProvider = "namecheap";
+      domain = "genchumen.com";
+      credentialFiles = {
+        "NAMECHEAP_API_KEY_FILE" = "/etc/acme_key";
+        "NAMECHEAP_API_USER_FILE" = "/etc/acme_user";
       };
     };
-    netdevs = {
-     "10-br0" = {
-        netdevConfig = {
-          Name = "br0";
-          Kind = "bridge";
-        };
-      };
-    };*/
-  };
+  };*/
+
 }

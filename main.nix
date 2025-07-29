@@ -1,10 +1,7 @@
 { config, pkgs, lib, trunk, home-manager, self, inputs, microvm, ... }:
 {
   nixpkgs.config.allowUnfreePredicate = pkg: builtins.elem (lib.getName pkg) [
-     "steam"
-     "steam-original"
-     "steam-run"
-     "zerotierone"
+         "zerotierone"
    ];
   imports = [
     ### Basic Settings and Config
@@ -17,7 +14,7 @@
     ###
     ### Programs, it's in the name
     ###
-    ./programs/cyberSecurity.nix
+    #./programs/cyberSecurity.nix
     ./programs/main.nix
     ### These Programs run for longer
     ### Thus wanted a special dir
@@ -26,36 +23,30 @@
     ### I Would Tell You Whats in Here
     ### But it's a Secret
     ###
-    ./secrets/secrets.nix
-    ### We emulate another computer
+    #./secrets/secrets.nix ## We emulate another computer
     ### because we couldn't trust these programs
     ### and emulated computers don't have rights
-    ./vms/vms.nix
+    #./vms/vms.nix
   ];
   environment.systemPackages = with pkgs; [
-    sshfs
-    nodejs_18
-    alsa-utils
-    tree
-    hugo
-    gcc
-    jq
-    pandoc
-    tokei
-    age
-    ssh-to-age
-    sops
-    nix-alien
-    nix-index
+    #sshfs
+    #tree
+    #gcc
+    #jq
+    #tokei
+    #age
+    #ssh-to-age
+    #sops
+    #nix-index
     vim
-    starship
+    #starship
     python3
   ];
   security.rtkit.enable = true;
   nix = {
     extraOptions = ''
       experimental-features = nix-command flakes
-      restrict-eval = false
+      
     '';
   };
   time.timeZone = "America/New_York";
@@ -71,12 +62,5 @@
   };
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-  # amd gpu
-  boot = {
-    initrd.kernelModules = [ "amdgpu" ];
-  };
-  nixpkgs.overlays = [
-    self.inputs.nix-alien.overlays.default
-  ];
   system.stateVersion = "24.05";
 }

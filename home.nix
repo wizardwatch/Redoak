@@ -10,7 +10,7 @@
   ];
   programs = {
    helix = {
-      enable = true;
+      enable = false;
       settings = {
       theme = "catppuccin_mocha";
         editor = {

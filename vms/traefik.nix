@@ -15,7 +15,7 @@ in {
     };
     linkConfig.RequiredForOnline = "routable";
   };
-  /*services.traefik = {
+  services.traefik = {
     enable = true;
 
     staticConfigOptions = {
@@ -57,5 +57,5 @@ in {
       http.routers = {};
       http.services = {};
     };
-  };*/
+  };
 }

@@ -1,32 +1,27 @@
 {
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-unstable";
-    sops-nix.url = "github:Mic92/sops-nix";
-    nix-alien = {
-      url = "github:thiagokokada/nix-alien";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    trunk = {
+    #sops-nix.url = "github:Mic92/sops-nix";
+/*    trunk = {
       url = "github:wizardwatch/trunk";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-    home-manager = {
+    };*/
+    /*home-manager = {
       url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-    microvm = {
+    };*/
+/*    microvm = {
       url = "github:astro/microvm.nix";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
+    };*/
   };
   outputs = 
     { self
     , nixpkgs
-    , trunk
-    , home-manager
-    , sops-nix
-    , nix-alien
-    , microvm
+    #, trunk
+    #, home-manager
+    #, sops-nix
+    #, microvm
     , ...
     }@inputs: 
     let
@@ -48,13 +43,13 @@
       };
       modules =
         [
-          microvm.nixosModules.host
-          sops-nix.nixosModules.sops
-          home-manager.nixosModules.home-manager
-          (trunk.nixosModules.common)
+          #microvm.nixosModules.host
+          #sops-nix.nixosModules.sops
+          #home-manager.nixosModules.home-manager
+          #(trunk.nixosModules.common)
           (import ./main.nix)
           (import ./unixStuff/hardware.nix)
-          ({ pkgs, lib, ... }: {
+          /*({ pkgs, lib, ... }: {
             home-manager = {
               extraSpecialArgs = {
                 inherit self;
@@ -63,11 +58,11 @@
               };
               useUserPackages = true;
               users.willow = pkgs.lib.mkMerge [
-                (trunk.nixosModules.userZshStarship)
+                #(trunk.nixosModules.userZshStarship)
                 (import ./home.nix)
               ];
             };
-          })
+          })*/
         ];
     };
   };

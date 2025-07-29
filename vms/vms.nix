@@ -2,6 +2,7 @@
 let 
 baseConfig = {
   microvm = {
+    hypervisor = "cloud-hypervisor";
     shares = [
       {
         source = "/nix/store";
@@ -17,6 +18,7 @@ baseConfig = {
       }
     ];
   };
+  system.stateVersion = "24.11";
 };
 
 # Use Traefik instead TODO: Write a base config for a share for the cert
@@ -35,33 +37,11 @@ in
       "traefik"
     ];
 
-    vms = {/*
-      matrix = {
-        pkgs = pkgs;
-        config = baseConfig // {      
-          microvm.shares = [{
-            proto = "virtiofs";
-            tag = "acme";
-            #source = "/var/lib/microvms/acme";
-            source = "/home/willow/cool";
-            mountPoint = "/var/lib/traefik";
-          }];
-          microvm.interfaces = [{
-            type = "tap";
-            id = "vm-test1";
-            mac = "02:00:00:00:00:01";
-          }];
-        } // import ./matrix.nix;
-      };*/
+    vms = {
+
       traefik = {
         pkgs = pkgs;
         config = baseConfig // {
-           
-        users.users.root.password = "toor";
-          services.openssh = {
-            enable = true;
-            settings.PermitRootLogin = "yes";
-         };
          microvm.interfaces = [{
             type = "macvtap";
             id = "vm-traefik";
@@ -71,9 +51,24 @@ in
             };
             mac = "02:00:00:00:00:04";
           }];
-                    microvm.hypervisor = "cloud-hypervisor";
          } // import ./traefik.nix;  
       };
+      
+      matrix = {
+        pkgs = pkgs;
+        config = baseConfig // {
+         microvm.interfaces = [{
+            type = "macvtap";
+            id = "vm-matrix";
+            macvtap = {
+              link = "eno1np1";
+              mode = "bridge";
+            };
+            mac = "02:00:00:00:00:06";
+          }];
+         } // import ./matrix.nix;  
+      };
+      
     }; 
   };
 }
